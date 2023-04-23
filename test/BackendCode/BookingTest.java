@@ -11,11 +11,22 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.assertj.swing;
+
+import org.assertj.swing.fixture.FrameFixture;
+import static org.assertj.swing.launcher.ApplicationLauncher.application;
+import static org.assertj.swing.finder.WindowFinder.findFrame;
+import static org.assertj.swing.core.matcher.JButtonMatcher.*;
+//import static org.assertj.swing.core.matcher.JTextComponentMatcher.*;
+import org.assertj.swing.core.*;
+import org.assertj.swing.core.GenericTypeMatcher;
+import java.awt.Frame;
+
+
+
 
 /**
  *
- * @author muzammilgodil
+ * @author wlace
  */
 public class BookingTest {
     
@@ -32,6 +43,32 @@ public class BookingTest {
     
     @Before
     public void setUp() {
+        application(GUI.Runner.class).start();
+        Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        FrameFixture frame = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "TEST".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        //FrameFixture window = new FrameFixture(robot, frame);
+        frame.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("user")).enterText("admin");
+        frame.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("pass")).enterText("123");
+        frame.button(withText("Login")).click();
+        //frame.button(withText("Booking Details")).click();
+        //frame.close();
+        FrameFixture mainFrame = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "main".equals(frame.getName()) && frame.isShowing();
+        }
+        }).using(robot);
+        mainFrame.button(withText("Booking Details")).click();
+        try {
+        Thread.sleep(5000);
+        } catch(Exception e) {
+            System.out.println("ERR");
+        }
+        //fra
+        
     }
     
     @After
@@ -44,12 +81,18 @@ public class BookingTest {
     @Test
     public void testGetID() {
         System.out.println("getID");
+        
+        //mine playing with assertj
+        FrameFixture f;
+        //FrameFixture window = new FrameFixture(robot(), f);
+//window.show();
+//window.button(withName("ok").andText("OK")).click();
         Booking instance = new Booking();
         int expResult = 0;
         int result = instance.getID();
         assertEquals(expResult, result);
         // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        //fail("The test case is a prototype.");
     }
 
     /**

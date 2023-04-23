@@ -11,7 +11,7 @@ import javax.swing.JLabel;
  */
 public class Runner {
 
-    private static final JFrame FRAME = new JFrame();
+    private static final JFrame FRAME = new JFrame("TEST");
     private final ImageIcon icon;
     private final JLabel L1;
 

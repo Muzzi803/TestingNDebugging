@@ -45,8 +45,10 @@ public class Login {
         Image_jLabel = new JLabel();
 
         UN_TextField = new JTextField();
+        UN_TextField.setName("user");
         Password_Field = new JPasswordField();
-
+        Password_Field.setName("pass");
+        
         MiniPanel.setBackground(Color.BLUE);
         MiniPanel.setForeground(Color.WHITE);
         MiniPanel.setLayout(new FlowLayout());
@@ -122,6 +124,7 @@ public class Login {
                         JFrame mainFrame = Parent_JFrame.getMainFrame();
 //                        JPanel mainPanel = menu.getMainPanel();
                         mainFrame.add(menu.getMainPanel());
+                        mainFrame.setName("main");
                         mainFrame.setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "Invalid UserName/Password", "Error", JOptionPane.ERROR_MESSAGE);
