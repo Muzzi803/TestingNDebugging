@@ -78,6 +78,9 @@ public class BookingTest {
         
     }
     
+    
+    
+    
     @After
     public void tearDown() {
     }
@@ -133,6 +136,153 @@ public class BookingTest {
         
         
     }
+    
+    
+    @Test
+    public void testDoubleBookCar() {
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("1");
+        bookcar.button(withText("Book")).click();
+        bookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("Book Confirmation")).optionPane().okButton().click();
+        bookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("Message")).button().click();
+        
+        String [][] table = mainFrame.table().contents();
+        
+        System.out.println(table[table.length - 1][2]);
+        //bookcar.table().contents();
+        assertEquals(table[table.length - 1][2], "1: Muhammad Ali");
+        assertEquals(table[table.length - 1][3], "1: Aqua");
+        assertEquals(table[table.length - 1][5], "Not returned yet !");
+        
+        
+        
+        //attempt double book
+        mainFrame.button(withText("Book")).click();
+        bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("1");
+        bookcar.button(withText("Book")).click();
+        bookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withName("dialog2")).button().click();
+
+        
+        
+        
+        
+        mainFrame.button(withText("Unbook")).click();
+        FrameFixture unbookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "UnBook Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        unbookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("1");
+        unbookcar.button(withText("UnBook")).click();
+        
+        unbookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("UnBook Confirmation")).optionPane().okButton().click();
+        unbookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withName("dialog3")).button().click();
+        
+        table = mainFrame.table().contents();
+        assertEquals(table[table.length - 1][2], "1: Muhammad Ali");
+        assertEquals(table[table.length - 1][3], "1: Aqua");
+        assertNotEquals(table[table.length - 1][5], "Not returned yet !");
+    }
+    
+    
+    
+    @Test
+    public void testCarIDDoesntExist() {
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("99999");
+        bookcar.button(withText("Book")).click();
+        
+        bookcar.label(org.assertj.swing.core.matcher.JLabelMatcher.withName("car_val_label")).requireText("                                                            Car ID does not exists !");
+        
+        
+        
+    }
+    
+    @Test
+    public void testCarIDCantBe0OrNeg() {
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("-1");
+        bookcar.button(withText("Book")).click();
+        
+        bookcar.label(org.assertj.swing.core.matcher.JLabelMatcher.withName("car_val_label")).requireText("                                                            ID cannot be '0' or negative !");
+        
+        
+        
+    }
+    
+    
+    @Test
+    public void testCarIDInvalid() {
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("asdf");
+        bookcar.button(withText("Book")).click();
+        
+        bookcar.label(org.assertj.swing.core.matcher.JLabelMatcher.withName("car_val_label")).requireText("                                                            Invalid ID !");
+        
+        
+        
+    }
+    
+    @Test
+    public void testCarIDEmpty() {
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("");
+        bookcar.button(withText("Book")).click();
+        
+        bookcar.label(org.assertj.swing.core.matcher.JLabelMatcher.withName("car_val_label")).requireText("                                                            Enter Car ID !");
+        
+        
+        
+    }
+    
     
     /**
      * Test of getID method, of class Booking.

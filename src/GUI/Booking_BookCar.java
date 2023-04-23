@@ -44,6 +44,7 @@ public class Booking_BookCar extends JFrame {
 
         CarID_Label = new JLabel("Enter Car ID to be Booked");
         CarIDValidity_Label = new JLabel();
+        CarIDValidity_Label.setName("car_val_label");
         CarID_TextField = new JTextField();
         CarID_TextField.setName("car_ID");
 
