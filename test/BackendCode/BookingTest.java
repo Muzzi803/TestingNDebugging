@@ -17,6 +17,7 @@ import static org.assertj.swing.launcher.ApplicationLauncher.application;
 import static org.assertj.swing.finder.WindowFinder.findFrame;
 import static org.assertj.swing.core.matcher.JButtonMatcher.*;
 //import static org.assertj.swing.core.matcher.JTextComponentMatcher.*;
+//import static org.assertj.swing.core.matcher.DialogMatcher.
 import org.assertj.swing.core.*;
 import org.assertj.swing.core.GenericTypeMatcher;
 import java.awt.Frame;
@@ -29,6 +30,9 @@ import java.awt.Frame;
  * @author wlace
  */
 public class BookingTest {
+    
+    FrameFixture mainFrame;
+    Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
     
     public BookingTest() {
     }
@@ -44,7 +48,7 @@ public class BookingTest {
     @Before
     public void setUp() {
         application(GUI.Runner.class).start();
-        Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
         FrameFixture frame = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
         protected boolean isMatching(Frame frame) {
             return "TEST".equals(frame.getTitle()) && frame.isShowing();
@@ -56,18 +60,21 @@ public class BookingTest {
         frame.button(withText("Login")).click();
         //frame.button(withText("Booking Details")).click();
         //frame.close();
-        FrameFixture mainFrame = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        mainFrame = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
         protected boolean isMatching(Frame frame) {
             return "main".equals(frame.getName()) && frame.isShowing();
         }
         }).using(robot);
         mainFrame.button(withText("Booking Details")).click();
-        try {
-        Thread.sleep(5000);
-        } catch(Exception e) {
-            System.out.println("ERR");
-        }
+        
+        //try {
+        //Thread.sleep(5000);
+        //} catch(Exception e) {
+        //    System.out.println("ERR");
+        //}
         //fra
+        
+        
         
     }
     
@@ -75,6 +82,58 @@ public class BookingTest {
     public void tearDown() {
     }
 
+    
+    @Test
+    public void testLoginAndNavigate() {
+        mainFrame.requireTitle("Booking Details - Rent-A-Car Management System");
+    }
+    
+    @Test
+    public void testSuccessfulBookUnbook(){
+        //Robot robot = BasicRobot.robotWithCurrentAwtHierarchy();
+        mainFrame.button(withText("Book")).click();
+        FrameFixture bookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "Book Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("cust_ID")).enterText("1");
+        bookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("1");
+        bookcar.button(withText("Book")).click();
+        bookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("Book Confirmation")).optionPane().okButton().click();
+        bookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("Message")).button().click();
+        
+        String [][] table = mainFrame.table().contents();
+        
+        System.out.println(table[table.length - 1][2]);
+        //bookcar.table().contents();
+        assertEquals(table[table.length - 1][2], "1: Muhammad Ali");
+        assertEquals(table[table.length - 1][3], "1: Aqua");
+        assertEquals(table[table.length - 1][5], "Not returned yet !");
+        
+        
+        mainFrame.button(withText("Unbook")).click();
+        FrameFixture unbookcar = findFrame(new GenericTypeMatcher<Frame>(Frame.class) {
+        protected boolean isMatching(Frame frame) {
+            return "UnBook Car".equals(frame.getTitle()) && frame.isShowing();
+        }
+        }).using(robot);
+        
+        unbookcar.textBox(org.assertj.swing.core.matcher.JTextComponentMatcher.withName("car_ID")).enterText("1");
+        unbookcar.button(withText("UnBook")).click();
+        
+        unbookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withTitle("UnBook Confirmation")).optionPane().okButton().click();
+        unbookcar.dialog(org.assertj.swing.core.matcher.DialogMatcher.withName("dialog3")).button().click();
+        
+        table = mainFrame.table().contents();
+        assertEquals(table[table.length - 1][2], "1: Muhammad Ali");
+        assertEquals(table[table.length - 1][3], "1: Aqua");
+        assertNotEquals(table[table.length - 1][5], "Not returned yet !");
+        
+        
+    }
+    
     /**
      * Test of getID method, of class Booking.
      */
